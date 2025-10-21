@@ -10,8 +10,8 @@ def generate_launch_description():
             executable = 'odrive_can_node',
             name = 'can_node',
             parameters = [
-                {'node_id' , 0},
-                {'interface' , 'can0'}
+                {'node_id' : 0},
+                {'interface' : 'can0'}
             ]
         ),
 
