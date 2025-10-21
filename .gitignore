@@ -1,0 +1,4 @@
+
+# Ignore the ros_odrive package/directory
+ros_odrive/
+
