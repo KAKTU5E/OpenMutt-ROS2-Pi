@@ -9,10 +9,10 @@ def generate_launch_description():
             namespace = 'odrive_axis0',
             executable = 'odrive_can_node',
             name = 'can_node',
-            parameters = [
-                {'node_id' : 0},
-                {'interface' : 'can0'}
-            ]
+            parameters = [{
+                'node_id' : 0,
+                'interface' : 'can0'
+            }]
         ),
 
         Node(
@@ -22,5 +22,5 @@ def generate_launch_description():
             name = 'joint_sub_node',
         )
 
-    ])
-
+    ]
+)

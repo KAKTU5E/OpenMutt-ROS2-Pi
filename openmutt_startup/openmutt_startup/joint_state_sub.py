@@ -16,7 +16,7 @@ class JointStateSubscriber(Node): # create Joint_State_Subscriber class based on
         self.state_sub
 
     def subscriber_callback(self, msg): 
-        self.get_logger().info(f"I received\n{msg}") 
+        self.get_logger().info(f"Received\n{msg}") 
 
 
 def main(args=None):
