@@ -1,0 +1,14 @@
+Champ Controller JointState joint order:
+
+- lf_hip_joint          --> left front
+- lf_upper_leg_joint    
+- lf_lower_leg_joint    
+- rf_hip_joint          --> right front
+- rf_upper_leg_joint    
+- rf_lower_leg_joint    
+- lh_hip_joint          --> left hind/rear
+- lh_upper_leg_joint    
+- lh_lower_leg_joint    
+- rh_hip_joint          --> right hind/rear
+- rh_upper_leg_joint    
+- rh_lower_leg_joint    
