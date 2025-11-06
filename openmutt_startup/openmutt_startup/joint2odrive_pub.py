@@ -18,7 +18,7 @@ class Joint2Odrive(Node):
         self.declare_parameter('sign',         [1.0]*12)          # +1 or -1 per axis
         self.declare_parameter('zero_rad',     [0.0]*12)          # joint zero offsets (rad)
         self.declare_parameter('offset_rotation',   [0.0]*12)          # constant motor rotation offsets
-        self.declare_parameter('namespace_format','/odrive_axis{}/control')
+        self.declare_parameter('namespace_format','/odrive_axis{}/control_message')
         self.declare_parameter('control_mode', 3)                 # POSITION_CONTROL (verify)
         self.declare_parameter('input_mode',   1)                 # PASSTHROUGH (verify)
 
