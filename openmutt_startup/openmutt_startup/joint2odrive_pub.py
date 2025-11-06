@@ -4,6 +4,9 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from odrive_can.msg import ControlMessage
+from odrive_can.srv import AxisState
+import time
+
 
 TWOPI = 2.0 * math.pi
 
@@ -21,6 +24,7 @@ class Joint2Odrive(Node):
         self.declare_parameter('namespace_format','/odrive_axis{}/control_message')
         self.declare_parameter('control_mode', 3)                 # POSITION_CONTROL (verify)
         self.declare_parameter('input_mode',   1)                 # PASSTHROUGH (verify)
+        self.declare_parameter('axis_state', [8]*12)              # sets all 12 motors to closed loop control mode
 
         self.axis_indices = list(self.get_parameter('axis_indices').value)
         self.motor_map    = list(self.get_parameter('motor_map').value)
@@ -31,8 +35,10 @@ class Joint2Odrive(Node):
         self.namespace_format = self.get_parameter('namespace_format').value
         self.control_mode    = int(self.get_parameter('control_mode').value)
         self.input_mode      = int(self.get_parameter('input_mode').value)
+        self.axis_state   = list(self.get_parameter('axis_state').value)
 
         # Publishers: one per axis
+
         self.pubs = []
         for axis in self.axis_indices:
             topic = self.namespace_format.format(axis)
@@ -43,6 +49,31 @@ class Joint2Odrive(Node):
         self.create_subscription(JointState, '/joint_states', self.cb_joint_states, 10)
 
         self.get_logger().info('JointToOdrive ready.')
+
+
+    def req_axis_state(self, node: Node, axis_index: int, state: int = 8):
+
+        service = f'/odrive_axis{axis_index}/request_axis_state'
+        cli = node.create_client(AxisState, service)
+
+        if not cli.wait_for_service(timeout_sec=3):
+            node.get_logger().error(f'Service {service} not available.')
+            return False
+        
+        req = AxisState.Request()
+        req.axis_requested_state = state
+
+        future = cli.call_async(req)
+        rclpy.spin_until_future_complete(node, future)
+
+        if future.result() is not None:
+            node.get_logger().info(f'Axis {axis_index} set to state {state}')
+            return True
+        else:
+            node.get_logger().error(f'Failed to call {service}: {future.exception()}')
+            return False
+
+    time.sleep(2)
 
     def cb_joint_states(self, js: JointState):
         # Safety guard
@@ -66,6 +97,7 @@ class Joint2Odrive(Node):
             self.pubs[k].publish(msg)
 
 def main():
+
     rclpy.init()
     node = Joint2Odrive()
     try:

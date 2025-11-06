@@ -22,14 +22,7 @@ def generate_launch_description():
         namespace='joint_pub',
         executable='single_test_pub',  # make sure console_scripts matches
         name='single_test_joint2odrive',
-        parameters=[{
-            'motor_map':  [0],
-            'gear_ratio': [13.0]*1,
-            'sign':       [1.0]*1,
-            'control_mode': 3,
-            'input_mode':   1,
-            'namespace_format': '/odrive_axis{}/control',  # matches your node’s param
-        }]
+        
     )
 
     # FLAT list — use unpacking so there’s zero chance of nesting mistakes

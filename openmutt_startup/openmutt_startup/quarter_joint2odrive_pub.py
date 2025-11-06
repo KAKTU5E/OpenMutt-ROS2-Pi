@@ -4,6 +4,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from odrive_can.msg import ControlMessage  # from your CLI output
+from odrive_can.srv import AxisState
 
 TWOPI = 2.0 * math.pi
 
@@ -44,6 +45,28 @@ class Quarter_Joint2Odrive(Node):
 
         self.get_logger().info('Quarter_JointToOdrive ready.')
 
+    def req_axis_state(self, node: Node, axis_index: int, state: int = 8):
+
+        service = f'/odrive_axis{axis_index}/request_axis_state'
+        cli = node.create_client(AxisState, service)
+
+        if not cli.wait_for_service(timeout_sec=3):
+            node.get_logger().error(f'Service {service} not available.')
+            return False
+        
+        req = AxisState.Request()
+        req.axis_requested_state = state
+
+        future = cli.call_async(req)
+        rclpy.spin_until_future_complete(node, future)
+
+        if future.result() is not None:
+            node.get_logger().info(f'Axis {axis_index} set to state {state}')
+            return True
+        else:
+            node.get_logger().error(f'Failed to call {service}: {future.exception()}')
+            return False
+
     def cb_joint_states(self, js: JointState):
         # Safety guard
         if not js.position:
@@ -64,6 +87,8 @@ class Quarter_Joint2Odrive(Node):
             msg.input_pos    = float(rot)
             # leave vel/torque unset (0.0) in position mode
             self.pubs[k].publish(msg)
+
+
 
 def main():
     rclpy.init()
