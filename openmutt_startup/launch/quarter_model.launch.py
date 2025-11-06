@@ -34,7 +34,7 @@ def generate_launch_description():
             'sign':       [1.0]*3,
             'control_mode': 3,
             'input_mode':   1,
-            'namespace_fmt':'/odrive_axis{}/control',
+            'namespace_format':'/odrive_axis{}/control',
         }],
 )
 

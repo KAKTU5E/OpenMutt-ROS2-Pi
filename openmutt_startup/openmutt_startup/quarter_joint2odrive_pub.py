@@ -29,7 +29,7 @@ class Quarter_Joint2Odrive(Node):
         self.zero_rad           = list(self.get_parameter('zero_rad').value)
         self.offset_rotation    = list(self.get_parameter('offset_rotation').value)
         self.namespace_format   = self.get_parameter('namespace_format').value
-        self.ctrl_mode          = int(self.get_parameter('control_mode').value)
+        self.control_mode          = int(self.get_parameter('control_mode').value)
         self.input_mode         = int(self.get_parameter('input_mode').value)
 
         # Publishers: one per axis
@@ -59,7 +59,7 @@ class Quarter_Joint2Odrive(Node):
             rot = self.sign[k] * ((q - self.zero_rad[k]) * (self.gear_ratio[k] / TWOPI)) + self.offset_rot[k]
 
             msg = ControlMessage()
-            msg.control_mode = self.ctrl_mode
+            msg.control_mode = self.control_mode
             msg.input_mode   = self.input_mode
             msg.input_pos    = float(rot)
             # leave vel/torque unset (0.0) in position mode

@@ -37,9 +37,22 @@ def generate_launch_description():
                     }]
                 )
             )
+        
+    joint_subscriber = Node(
+        package='openmutt_startup',
+        namespace='joint_sub',
+        executable='quarter_joint2odrive',
+        name='quarter_joint2odrive',
+        parameters=[{
+            'motor_map':  [0,1,2,3,4,5,6,7,8,9,10,11],
+            'gear_ratio': [13.0]*12,
+            'sign':       [1.0]*12,
+            'control_mode': 3,
+            'input_mode':   1,
+            'namespace_format':'/odrive_axis{}/control'
+        }]
+    )
 
     
 
-    
-
-    return LaunchDescription([can0_nodes, can1_nodes])
+    return LaunchDescription([can0_nodes, can1_nodes, joint_subscriber])
