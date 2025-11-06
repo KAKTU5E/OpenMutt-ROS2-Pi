@@ -56,7 +56,7 @@ class Quarter_Joint2Odrive(Node):
 
             # Convert radians -> rotations
             q = float(js.position[j])
-            rot = self.sign[k] * ((q - self.zero_rad[k]) * (self.gear_ratio[k] / TWOPI)) + self.offset_rot[k]
+            rot = self.sign[k] * ((q - self.zero_rad[k]) * (self.gear_ratio[k] / TWOPI)) + self.offset_rotation[k]
 
             msg = ControlMessage()
             msg.control_mode = self.control_mode
