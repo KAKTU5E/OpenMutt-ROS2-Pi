@@ -17,7 +17,7 @@ class Joint2Odrive(Node):
         self.declare_parameter('gear_ratio',   [13.0]*12)          # motor_rot / joint_rot
         self.declare_parameter('sign',         [1.0]*12)          # +1 or -1 per axis
         self.declare_parameter('zero_rad',     [0.0]*12)          # joint zero offsets (rad)
-        self.declare_parameter('offset_rot',   [0.0]*12)          # constant motor rotation offsets
+        self.declare_parameter('offset_rotation',   [0.0]*12)          # constant motor rotation offsets
         self.declare_parameter('namespace_format','/odrive_axis{}/control')
         self.declare_parameter('control_mode', 3)                 # POSITION_CONTROL (verify)
         self.declare_parameter('input_mode',   1)                 # PASSTHROUGH (verify)
@@ -27,10 +27,10 @@ class Joint2Odrive(Node):
         self.gear_ratio   = list(self.get_parameter('gear_ratio').value)
         self.sign         = list(self.get_parameter('sign').value)
         self.zero_rad     = list(self.get_parameter('zero_rad').value)
-        self.offset_rot   = list(self.get_parameter('offset_rot').value)
+        self.offset_rot   = list(self.get_parameter('offset_rotation').value)
         self.namespace_format = self.get_parameter('namespace_format').value
-        self.ctrl_mode    = int(self.get_parameter('control_mode').value)
-        self.in_mode      = int(self.get_parameter('input_mode').value)
+        self.control_mode    = int(self.get_parameter('control_mode').value)
+        self.input_mode      = int(self.get_parameter('input_mode').value)
 
         # Publishers: one per axis
         self.pubs = []
@@ -59,8 +59,8 @@ class Joint2Odrive(Node):
             rot = self.sign[k] * ((q - self.zero_rad[k]) * (self.gear_ratio[k] / TWOPI)) + self.offset_rot[k]
 
             msg = ControlMessage()
-            msg.control_mode = self.ctrl_mode
-            msg.input_mode   = self.in_mode
+            msg.control_mode = self.control_mode
+            msg.input_mode   = self.input_mode
             msg.input_pos    = float(rot)
             # leave vel/torque unset (0.0) in position mode
             self.pubs[k].publish(msg)

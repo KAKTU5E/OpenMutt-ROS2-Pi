@@ -23,13 +23,22 @@ def generate_launch_description():
             )
 
 
-    motor_publisher = Node(
-        package = 'openmutt_startup', 
-        namespace = 'quarter_joint2odrive_pub',
-        executable = 'quarter_joint2odrive_pub',
-        name = 'quarter_model_publisher',
-    )
+    joint_subscriber = Node(
+        package='openmutt_startup',
+        namespace='joint_sub',
+        executable='quarter_joint2odrive',
+        name='quarter_joint2odrive',
+        parameters=[{
+            'motor_map':  [0,1,2],
+            'gear_ratio': [13.0]*3,
+            'sign':       [1.0]*3,
+            'control_mode': 3,
+            'input_mode':   1,
+            'namespace_fmt':'/odrive_axis{}/control',
+        }],
+)
+
 
     
 
-    return LaunchDescription([can0_nodes, motor_publisher])
+    return LaunchDescription([can0_nodes, joint_subscriber])
