@@ -22,14 +22,7 @@ def generate_launch_description():
         namespace='joint_sub',
         executable='quarter_joint2odrive_pub',  # make sure console_scripts matches
         name='quarter_joint2odrive',
-        parameters=[{
-            'motor_map':  [0,1,2],
-            'gear_ratio': [13.0]*3,
-            'sign':       [1.0]*3,
-            'control_mode': 3,
-            'input_mode':   1,
-            'namespace_format': '/odrive_axis{}/control',  # matches your node’s param
-        }]
+        
     )
 
     # FLAT list — use unpacking so there’s zero chance of nesting mistakes

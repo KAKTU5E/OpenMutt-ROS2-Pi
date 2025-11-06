@@ -19,9 +19,9 @@ def generate_launch_description():
 
     odrive_publisher = Node(
         package='openmutt_startup',
-        namespace='joint_sub',
-        executable='quarter_joint2odrive_pub',  # make sure console_scripts matches
-        name='quarter_joint2odrive',
+        namespace='joint_pub',
+        executable='single_test_pub',  # make sure console_scripts matches
+        name='single_test_joint2odrive',
         parameters=[{
             'motor_map':  [0],
             'gear_ratio': [13.0]*1,

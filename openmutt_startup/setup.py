@@ -27,7 +27,8 @@ setup(
         'console_scripts': [
             f'joint_state_sub = {package_name}.joint_state_sub:main',
             f'joint2odrive_pub  = {package_name}.joint2odrive_pub:main',
-            f'quarter_joint2odrive_pub = {package_name}.quarter_joint2odrive_pub:main'
+            f'quarter_joint2odrive_pub = {package_name}.quarter_joint2odrive_pub:main',
+            f'single_test_pub = {package_name}.single_test_pub:main'
         ],
     },
 
