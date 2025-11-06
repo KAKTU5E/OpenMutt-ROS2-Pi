@@ -29,7 +29,7 @@ class Quarter_Joint2Odrive(Node):
         self.zero_rad           = list(self.get_parameter('zero_rad').value)
         self.offset_rotation    = list(self.get_parameter('offset_rotation').value)
         self.namespace_format   = self.get_parameter('namespace_format').value
-        self.control_mode          = int(self.get_parameter('control_mode').value)
+        self.control_mode       = int(self.get_parameter('control_mode').value)
         self.input_mode         = int(self.get_parameter('input_mode').value)
 
         # Publishers: one per axis

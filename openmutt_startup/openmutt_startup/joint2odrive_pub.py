@@ -42,7 +42,7 @@ class Joint2Odrive(Node):
         # Subscription
         self.create_subscription(JointState, '/joint_states', self.cb_joint_states, 10)
 
-        self.get_logger().info('JointToOdrive ready (Pattern A, per-axis ControlMessage).')
+        self.get_logger().info('JointToOdrive ready.')
 
     def cb_joint_states(self, js: JointState):
         # Safety guard
