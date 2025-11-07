@@ -31,7 +31,7 @@ def generate_launch_description():
         package='openmutt_startup',
         namespace='joint_sub',
         executable='joint2odrive_pub',  # make sure console_scripts matches
-        name='quarter_joint2odrive',
+        name='joint2odrive',
     
         )
 
