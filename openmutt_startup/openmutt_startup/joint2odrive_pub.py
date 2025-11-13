@@ -57,39 +57,41 @@ class Joint2Odrive(Node):
         # Safety guard
         if not js.position:
             return
+        else:
+            
+            # For each joint index j, find its target axis k
+            for j, k in enumerate(self.motor_map):
+                if j >= len(js.position):
+                    break
 
-        # For each joint index j, find its target axis k
-        for j, k in enumerate(self.motor_map):
-            if j >= len(js.position):
-                break
+                # Convert radians -> rotations
+                q = float(js.position[j])
+                rot = self.sign[k] * ((q - self.zero_rad[k]) * (self.gear_ratio[k] / TWOPI)) + self.offset_rot[k]
 
-            # Convert radians -> rotations
-            q = float(js.position[j])
-            rot = self.sign[k] * ((q - self.zero_rad[k]) * (self.gear_ratio[k] / TWOPI)) + self.offset_rot[k]
-
-            msg = ControlMessage()
-            msg.control_mode = self.control_mode
-            msg.input_mode   = self.input_mode
-            msg.input_pos    = float(rot)
-            # leave vel/torque unset (0.0) in position mode
-            self.pubs[k].publish(msg)
-
-            # send axis state request asynchronously (non-blocking)
-            # build request and call the client previously created
-            if k in self.srvs and self.srvs[k].service_is_ready():
-                
+                msg = ControlMessage()
+                msg.control_mode = self.control_mode
+                msg.input_mode   = self.input_mode
+                msg.input_pos    = float(rot)
+                # leave vel/torque unset (0.0) in position mode
+                self.pubs[k].publish(msg)
+            
                 for axis in self.axis_indices:
                     service = f'/odrive_axis{axis}/request_axis_state'
                     self.srvs[axis] = self.create_client(AxisState, service)
                     self.get_logger().info(f'Axis state client for {service}')
 
-                req = AxisState.Request()
-                req.axis_requested_state = 8
-                future = self.srvs[k].call_async(req)
-                # optional: add a callback to handle the response
-                future.add_done_callback(lambda fut, axis=k: self._on_axis_state_response(fut, axis))
+                # send axis state request asynchronously (non-blocking)
+                # build request and call the client previously created
+                if k in self.srvs and self.srvs[k].service_is_ready():
+                    
+                    req = AxisState.Request()
+                    req.axis_requested_state = 8
+                    future = self.srvs[k].call_async(req)
+                    # optional: add a callback to handle the response
+                    future.add_done_callback(lambda fut, axis=k: self._on_axis_state_response(fut, axis))
 
-        
+                
+        return future
 
     def _on_axis_state_response(self, future, axis):
         try:
