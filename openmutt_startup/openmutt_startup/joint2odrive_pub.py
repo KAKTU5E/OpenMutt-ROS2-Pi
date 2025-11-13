@@ -45,6 +45,14 @@ class Joint2Odrive(Node):
             self.pubs.append(self.create_publisher(ControlMessage, topic, 10))
             self.get_logger().info(f'Publishing to {topic}')
 
+
+        self.srvs = {}
+        for axis in self.axis_indices:
+            service = f'/odrive_axis{axis}/request_axis_state'
+            self.srvs[axis] = self.create_client(AxisState, service)                
+            self.get_logger().info(f'Axis state client for {service}')
+
+
         # create a client per axis so we can call services without recreating clients each time
 
         
@@ -75,11 +83,7 @@ class Joint2Odrive(Node):
                 # leave vel/torque unset (0.0) in position mode
                 self.pubs[k].publish(msg)
             
-                for axis in self.axis_indices:
-                    service = f'/odrive_axis{axis}/request_axis_state'
-                    self.srvs[axis] = self.create_client(AxisState, service)
-                    self.get_logger().info(f'Axis state client for {service}')
-
+                
                 # send axis state request asynchronously (non-blocking)
                 # build request and call the client previously created
                 if k in self.srvs and self.srvs[k].service_is_ready():
@@ -90,8 +94,7 @@ class Joint2Odrive(Node):
                     # optional: add a callback to handle the response
                     future.add_done_callback(lambda fut, axis=k: self._on_axis_state_response(fut, axis))
 
-                
-        return future
+
 
     def _on_axis_state_response(self, future, axis):
         try:
