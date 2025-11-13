@@ -82,7 +82,7 @@ class Joint2Odrive(Node):
             # build request and call the client previously created
             if k in self.srvs and self.srvs[k].service_is_ready():
                 req = AxisState.Request()
-                req.axis_requested_state = int(self.axis_state[k]) if k < len(self.axis_state) else 8
+                req.axis_requested_state = 8
                 future = self.srvs[k].call_async(req)
                 # optional: add a callback to handle the response
                 future.add_done_callback(lambda fut, axis=k: self._on_axis_state_response(fut, axis))
