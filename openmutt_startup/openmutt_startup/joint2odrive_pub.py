@@ -93,23 +93,6 @@ class Joint2Odrive(Node):
             self.get_logger().info(f'Axis {axis} state response: {res}')
         except Exception as e:
             self.get_logger().warn(f'Axis {axis} state call failed: {e}')
-
-
-    def req_axis_state(self, js: JointState, node: Node, axis_index: int, state: int = 8):
-        
-        for j, axis_index in enumerate(self.motor_map):
-            if j >= len(js.position):
-                break
-                     
-            service = f'/odrive_axis{axis_index}/request_axis_state'
-            cli = node.create_client(AxisState, service)
-            req = AxisState.Request()
-            req.axis_requested_state = state
-
-            future = cli.call_async(req)
-        
-            rclpy.spin_until_future_complete(node, future)
-            
         
 
 def main():

@@ -45,28 +45,6 @@ class Quarter_Joint2Odrive(Node):
 
         self.get_logger().info('Quarter_JointToOdrive ready.')
 
-    def req_axis_state(self, node: Node, axis_index: int, state: int = 8):
-
-        service = f'/odrive_axis{axis_index}/request_axis_state'
-        cli = node.create_client(AxisState, service)
-
-        if not cli.wait_for_service(timeout_sec=3):
-            node.get_logger().error(f'Service {service} not available.')
-            return False
-        
-        req = AxisState.Request()
-        req.axis_requested_state = state
-
-        future = cli.call_async(req)
-        rclpy.spin_until_future_complete(node, future)
-
-        if future.result() is not None:
-            node.get_logger().info(f'Axis {axis_index} set to state {state}')
-            return True
-        else:
-            node.get_logger().error(f'Failed to call {service}: {future.exception()}')
-            return False
-
     def cb_joint_states(self, js: JointState):
         # Safety guard
         if not js.position:
@@ -79,7 +57,7 @@ class Quarter_Joint2Odrive(Node):
 
             # Convert radians -> rotations
             q = float(js.position[j])
-            rot = self.sign[k] * ((q - self.zero_rad[k]) * (self.gear_ratio[k] / TWOPI)) + self.offset_rotation[k]
+            rot = self.sign[k] * ((q - self.zero_rad[k]) * (self.gear_ratio[k] / TWOPI)) + self.offset_rot[k]
 
             msg = ControlMessage()
             msg.control_mode = self.control_mode
@@ -88,6 +66,21 @@ class Quarter_Joint2Odrive(Node):
             # leave vel/torque unset (0.0) in position mode
             self.pubs[k].publish(msg)
 
+            # send axis state request asynchronously (non-blocking)
+            # build request and call the client previously created
+            if k in self.srvs and self.srvs[k].service_is_ready():
+                req = AxisState.Request()
+                req.axis_requested_state = int(self.axis_state[k]) if k < len(self.axis_state) else 8
+                future = self.srvs[k].call_async(req)
+                # optional: add a callback to handle the response
+                future.add_done_callback(lambda fut, axis=k: self._on_axis_state_response(fut, axis))
+
+    def _on_axis_state_response(self, future, axis):
+        try:
+            res = future.result()
+            self.get_logger().info(f'Axis {axis} state response: {res}')
+        except Exception as e:
+            self.get_logger().warn(f'Axis {axis} state call failed: {e}')
 
 
 def main():
