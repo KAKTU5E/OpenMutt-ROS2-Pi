@@ -22,8 +22,7 @@ class Joint2Odrive(Node):
         self.declare_parameter('namespace_format','/odrive_axis{}/control_message')
         self.declare_parameter('control_mode', 3)                 # POSITION_CONTROL (verify)
         self.declare_parameter('input_mode',   1)                 # PASSTHROUGH (verify)
-        self.declare_parameter('axis_state',   [8]*12)            # desired state per axis
-
+        
         self.axis_indices = list(self.get_parameter('axis_indices').value)
         self.motor_map    = list(self.get_parameter('motor_map').value)
         self.gear_ratio   = list(self.get_parameter('gear_ratio').value)
