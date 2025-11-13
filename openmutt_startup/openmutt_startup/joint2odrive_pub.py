@@ -46,12 +46,8 @@ class Joint2Odrive(Node):
             self.get_logger().info(f'Publishing to {topic}')
 
         # create a client per axis so we can call services without recreating clients each time
-        self.srvs = {}
-        for axis in self.axis_indices:
-            service = f'/odrive_axis{axis}/request_axis_state'
-            self.srvs[axis] = self.create_client(AxisState, service)
-            self.get_logger().info(f'Axis state client for {service}')
 
+        
         # Subscription
         self.create_subscription(JointState, '/joint_states', self.cb_joint_states, 10)
 
@@ -86,6 +82,11 @@ class Joint2Odrive(Node):
                 future = self.srvs[k].call_async(req)
                 # optional: add a callback to handle the response
                 future.add_done_callback(lambda fut, axis=k: self._on_axis_state_response(fut, axis))
+
+        for axis in self.axis_indices:
+                service = f'/odrive_axis{axis}/request_axis_state'
+                self.srvs[axis] = self.create_client(AxisState, service)
+                self.get_logger().info(f'Axis state client for {service}')
 
     def _on_axis_state_response(self, future, axis):
         try:
