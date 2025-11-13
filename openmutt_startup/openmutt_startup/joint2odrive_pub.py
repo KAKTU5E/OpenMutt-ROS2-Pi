@@ -77,16 +77,19 @@ class Joint2Odrive(Node):
             # send axis state request asynchronously (non-blocking)
             # build request and call the client previously created
             if k in self.srvs and self.srvs[k].service_is_ready():
+                
+                for axis in self.axis_indices:
+                    service = f'/odrive_axis{axis}/request_axis_state'
+                    self.srvs[axis] = self.create_client(AxisState, service)
+                    self.get_logger().info(f'Axis state client for {service}')
+
                 req = AxisState.Request()
                 req.axis_requested_state = 8
                 future = self.srvs[k].call_async(req)
                 # optional: add a callback to handle the response
                 future.add_done_callback(lambda fut, axis=k: self._on_axis_state_response(fut, axis))
 
-        for axis in self.axis_indices:
-                service = f'/odrive_axis{axis}/request_axis_state'
-                self.srvs[axis] = self.create_client(AxisState, service)
-                self.get_logger().info(f'Axis state client for {service}')
+        
 
     def _on_axis_state_response(self, future, axis):
         try:
